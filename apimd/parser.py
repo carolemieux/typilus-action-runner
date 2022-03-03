@@ -19,8 +19,7 @@ from ast import (
     BitOr, Call, If, Try, Tuple, List, Set, Dict, Constant, Load, Attribute,
     arg, expr, stmt, arguments, NodeTransformer,
 )
-from .logger import logger
-from .pep585 import PEP585
+from pep585 import PEP585
 
 _I = Union[Import, ImportFrom]
 _G = Union[Assign, AnnAssign]
@@ -249,9 +248,6 @@ class Resolver(NodeTransformer):
         elif idf == 'typing.Optional':
             return BinOp(node.slice, BitOr(), Constant(None))
         elif idf in PEP585:
-            logger.warning(f"{node.lineno}:{node.col_offset}: "
-                           f"find deprecated name {idf}, "
-                           f"recommended to use {PEP585[idf]}")
             return Subscript(Name(PEP585[idf], Load), node.slice, node.ctx)
         else:
             return node
@@ -594,7 +590,7 @@ class Parser:
             elif is_magic(name):
                 continue
             else:
-                logger.warning(f"Missing documentation for {name}")
+                pass
             level = name.removeprefix(self.root[name]).count('.')
             toc.append(" " * 4 * level + f"+ [{code(name)}](#{link})")
             docs.append(doc.rstrip())
